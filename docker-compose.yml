@@ -1,0 +1,6 @@
+version: '3.2'
+services:
+  dynamodb:
+    image: dwmkerr/dynamodb
+    ports:
+      - "27017:27017"
