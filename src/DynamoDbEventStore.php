@@ -6,13 +6,15 @@
  * Time: 17:17
  */
 
-namespace App\src\DynamoDb;
+namespace Broadway\EventStore\DynamoDb;
 
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
+use Broadway\EventStore\DynamoDb\Objects\ConvertAwsItemToArray;
+use Broadway\EventStore\DynamoDb\Objects\ScanFilter;
 use Broadway\EventStore\EventStore;
 use Broadway\EventStore\EventStreamNotFoundException;
 use Broadway\EventStore\EventVisitor;
@@ -60,15 +62,62 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
      */
     public function load($id) :DomainEventStream
     {
-        $args = [
-            'TableName' => $this->table,
-            'Key' => ['uuid' => $id, 'playhead' => 0],
+        $marshaler = new Marshaler();
+
+        $fields = [
+            'uuid' => $id,
+            'playhead' => 0
         ];
 
-        $items = $this->client->getItem($args);
+        $scanFilter = new ScanFilter($fields);
+
+        $eav = $marshaler->marshalJson($scanFilter->getJson());
+
+        $items = $this->client->scan(array(
+            'TableName' => $this->table,
+            'FilterExpression' => '#uuid = :uuid and playhead = :playhead',
+            'ExpressionAttributeNames' =>['#uuid' => 'uuid'],
+            "ExpressionAttributeValues" => $eav,
+        ));
 
         $events = [];
-        foreach ($items as $item) {
+        foreach ($items['Items'] as $item) {
+            $events[] = $this->deserializeEvent($item);
+        }
+
+        if (empty($events)) {
+            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->tableName));
+        }
+
+        return new DomainEventStream($events);
+    }
+
+    /**
+     * @param mixed $id
+     * @param int $playhead
+     */
+    public function loadFromPlayhead($id, int $playhead): DomainEventStream
+    {
+        $marshaler = new Marshaler();
+
+        $fields = [
+            'uuid' => $id,
+            'playhead' => $playhead
+        ];
+
+        $scanFilter = new ScanFilter($fields);
+
+        $eav = $marshaler->marshalJson($scanFilter->getJson());
+
+        $items = $this->client->scan(array(
+            'TableName' => $this->table,
+            'FilterExpression' => '#uuid = :uuid and playhead = :playhead',
+            'ExpressionAttributeNames' =>['#uuid' => 'uuid'],
+            "ExpressionAttributeValues" => $eav,
+        ));
+
+        $events = [];
+        foreach ($items['Items'] as $item) {
             $events[] = $this->deserializeEvent($item);
         }
 
@@ -81,38 +130,15 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
 
     private function deserializeEvent($row)
     {
+        $eventData = ConvertAwsItemToArray::convert($row);
+
         return new DomainMessage(
-            $row['uuid'],
-            (int) $row['playhead'],
-            $this->metadataSerializer->deserialize(json_decode($row['metadata'], true)),
-            $this->payloadSerializer->deserialize(json_decode($row['payload'], true)),
-            DateTime::fromString($row['recorded_on'])
+            $eventData['uuid'],
+            (int) $eventData['playhead'],
+            $this->metadataSerializer->deserialize(json_decode($eventData['metadata'], true)),
+            $this->payloadSerializer->deserialize(json_decode($eventData['payload'], true)),
+            DateTime::fromString($eventData['recorded_on'])
         );
-    }
-
-    /**
-     * @param mixed $id
-     * @param int $playhead
-     */
-    public function loadFromPlayhead($id, int $playhead): DomainEventStream
-    {
-        $args = [
-            'TableName' => $this->table,
-            'Key' => ['uuid' => $id, 'playhead' => $playhead],
-        ];
-
-        $items = $this->client->getItem($args);
-
-        $events = [];
-        foreach ($items as $item) {
-            $events[] = $this->deserializeEvent($item);
-        }
-
-        if (empty($events)) {
-            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->tableName));
-        }
-
-        return new DomainEventStream($events);
     }
 
     /**
