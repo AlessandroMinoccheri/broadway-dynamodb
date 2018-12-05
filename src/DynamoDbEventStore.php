@@ -14,12 +14,14 @@ use Aws\DynamoDb\Marshaler;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\EventStore\DynamoDb\Objects\ConvertAwsItemToArray;
+use Broadway\EventStore\DynamoDb\Objects\DeserializeEvent;
 use Broadway\EventStore\DynamoDb\Objects\ScanFilter;
 use Broadway\EventStore\EventStore;
 use Broadway\EventStore\EventStreamNotFoundException;
 use Broadway\EventStore\EventVisitor;
 use Broadway\EventStore\Exception\DuplicatePlayheadException;
 use Broadway\EventStore\Management\Criteria;
+use Broadway\EventStore\Management\CriteriaNotSupportedException;
 use Broadway\EventStore\Management\EventStoreManagement;
 use Broadway\Serializer\Serializer;
 use Broadway\Domain\DateTime;
@@ -47,7 +49,8 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         Serializer $payloadSerializer,
         Serializer $metadataSerializer,
         string $table
-    ) {
+    )
+    {
         $this->client = $dynamoDbClient;
 
         $this->payloadSerializer = $payloadSerializer;
@@ -60,7 +63,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
      *
      * @return DomainEventStream
      */
-    public function load($id) :DomainEventStream
+    public function load($id): DomainEventStream
     {
         $marshaler = new Marshaler();
 
@@ -76,13 +79,13 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         $items = $this->client->scan(array(
             'TableName' => $this->table,
             'FilterExpression' => '#uuid = :uuid and playhead = :playhead',
-            'ExpressionAttributeNames' =>['#uuid' => 'uuid'],
+            'ExpressionAttributeNames' => ['#uuid' => 'uuid'],
             "ExpressionAttributeValues" => $eav,
         ));
 
         $events = [];
         foreach ($items['Items'] as $item) {
-            $events[] = $this->deserializeEvent($item);
+            $events[] = DeserializeEvent::deserialize($item, $this->payloadSerializer, $this->metadataSerializer);
         }
 
         if (empty($events)) {
@@ -112,13 +115,13 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         $items = $this->client->scan(array(
             'TableName' => $this->table,
             'FilterExpression' => '#uuid = :uuid and playhead = :playhead',
-            'ExpressionAttributeNames' =>['#uuid' => 'uuid'],
+            'ExpressionAttributeNames' => ['#uuid' => 'uuid'],
             "ExpressionAttributeValues" => $eav,
         ));
 
         $events = [];
         foreach ($items['Items'] as $item) {
-            $events[] = $this->deserializeEvent($item);
+            $events[] = DeserializeEvent::deserialize($item, $this->payloadSerializer, $this->metadataSerializer);
         }
 
         if (empty($events)) {
@@ -126,19 +129,6 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
 
         return new DomainEventStream($events);
-    }
-
-    private function deserializeEvent($row)
-    {
-        $eventData = ConvertAwsItemToArray::convert($row);
-
-        return new DomainMessage(
-            $eventData['uuid'],
-            (int) $eventData['playhead'],
-            $this->metadataSerializer->deserialize(json_decode($eventData['metadata'], true)),
-            $this->payloadSerializer->deserialize(json_decode($eventData['payload'], true)),
-            DateTime::fromString($eventData['recorded_on'])
-        );
     }
 
     /**
@@ -158,13 +148,13 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
     private function insertMessage(DomainMessage $domainMessage)
     {
         $data = [
-            'id'          => Uuid::uuid4()->toString(),
-            'uuid'        => $domainMessage->getId(),
-            'playhead'    => $domainMessage->getPlayhead(),
-            'metadata'    => json_encode($this->metadataSerializer->serialize($domainMessage->getMetadata())),
-            'payload'     => json_encode($this->payloadSerializer->serialize($domainMessage->getPayload())),
+            'id' => Uuid::uuid4()->toString(),
+            'uuid' => $domainMessage->getId(),
+            'playhead' => $domainMessage->getPlayhead(),
+            'metadata' => json_encode($this->metadataSerializer->serialize($domainMessage->getMetadata())),
+            'payload' => json_encode($this->payloadSerializer->serialize($domainMessage->getPayload())),
             'recorded_on' => $domainMessage->getRecordedOn()->toString(),
-            'type'        => $domainMessage->getType(),
+            'type' => $domainMessage->getType(),
         ];
 
         $marshal = new Marshaler();
@@ -180,6 +170,47 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
 
     public function visitEvents(Criteria $criteria, EventVisitor $eventVisitor)
     {
-        // TODO: Implement visitEvents() method.
+        if ($criteria->getAggregateRootTypes()) {
+            throw new CriteriaNotSupportedException(
+                'DynamoDb implementation cannot support criteria based on aggregate root types.'
+            );
+        }
+
+        $fields = $this->convertCriteriaToArray($criteria);
+
+
+        $scanFilter = new ScanFilter($fields);
+
+        $marshaler = new Marshaler();
+        $eav = $marshaler->marshalJson($scanFilter->getJson());
+
+        $items = $this->client->scan(array(
+            'TableName' => $this->table,
+            'FilterExpression' => $scanFilter->getFilter(),
+            'ExpressionAttributeNames' => $scanFilter->getAttributeNames(),
+            "ExpressionAttributeValues" => $eav,
+        ));
+
+
+        foreach ($items['Items'] as $event) {
+            $eventVisitor->doWithEvent(
+                DeserializeEvent::deserialize($event, $this->payloadSerializer, $this->metadataSerializer)
+            );
+        }
+
+        return $items;
+    }
+
+    private function convertCriteriaToArray(Criteria $criteria) :array
+    {
+        $findBy = [];
+        if ($criteria->getAggregateRootIds()) {
+            $findBy['uuid'] = ['in' => $criteria->getAggregateRootIds()];
+        }
+        if ($criteria->getEventTypes()) {
+            $findBy['type'] = ['in' => $criteria->getEventTypes()];
+        }
+
+        return $findBy;
     }
 }

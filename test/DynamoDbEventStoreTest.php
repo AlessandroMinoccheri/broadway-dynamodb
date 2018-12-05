@@ -6,6 +6,9 @@ use Aws\DynamoDb\DynamoDbClient;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\EventStore\DynamoDb\DynamoDbEventStore;
+use Broadway\EventStore\DynamoDb\Objects\DeserializeEvent;
+use Broadway\EventStore\EventVisitor;
+use Broadway\EventStore\Management\Criteria;
 use Broadway\Serializer\ReflectionSerializer;
 
 /**
@@ -31,7 +34,15 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
             ],
         ]);
 
-        $dynamodb->deleteTable(['TableName'=> 'dynamo_table']);
+        $tables = $dynamodb->listTables([]);
+
+        if (isset($tables['TableNames'])) {
+            foreach ($tables['TableNames'] as $dynamoDbTable) {
+                $dynamodb->deleteTable([
+                    'TableName' => $dynamoDbTable,
+                ]);
+            }
+        }
 
         $dynamodb->createTable([
             'TableName' => 'dynamo_table',
@@ -134,5 +145,75 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals($payload, $event->getPayload());
             $this->assertEquals($recordedOn, $event->getRecordedOn());
         }
+    }
+
+    private function appendEvent($id)
+    {
+        $playhead = random_int(1, 9999);
+        $metadata = new \Broadway\Domain\Metadata(['id' => $id, 'foo' => 'bar']);
+        $payload = new class(){};
+        $recordedOn = \Broadway\Domain\DateTime::now();
+
+        $domainMessage = new DomainMessage(
+            $id,
+            $playhead,
+            $metadata,
+            $payload,
+            $recordedOn
+        );
+
+        return new DomainEventStream([$domainMessage]);
+    }
+
+    public function testInsertMessageAndVisitEvents()
+    {
+        $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
+        $id2 =  \Ramsey\Uuid\Uuid::uuid4()->toString();
+
+        $eventStream = $this->appendEvent($id);
+        $this->dynamoDbEventStore->append($id, $eventStream);
+
+        $eventStream = $this->appendEvent($id2);
+        $this->dynamoDbEventStore->append($id2, $eventStream);
+
+        $criteria = Criteria::create()->withAggregateRootIds([
+            $id,
+            $id2,
+        ]);
+
+        $eventVisitor = new RecordingEventVisitor();
+
+        $events = $this->dynamoDbEventStore->visitEvents($criteria, $eventVisitor);
+
+        $this->assertCount(2, $events['Items']);
+
+        foreach ($events['Items'] as $event) {
+            $eventDeserialized = DeserializeEvent::deserialize($event, new ReflectionSerializer(), new ReflectionSerializer());
+            $this->assertTrue($eventDeserialized->getId() === $id || $eventDeserialized->getId() === $id2);
+        }
+    }
+}
+
+
+class RecordingEventVisitor implements EventVisitor
+{
+    /**
+     * @var DomainMessage
+     */
+    private $visitedEvents;
+
+    public function doWithEvent(DomainMessage $domainMessage)
+    {
+        $this->visitedEvents[] = $domainMessage;
+    }
+
+    public function getVisitedEvents()
+    {
+        return $this->visitedEvents;
+    }
+
+    public function clearVisitedEvents()
+    {
+        $this->visitedEvents = [];
     }
 }
