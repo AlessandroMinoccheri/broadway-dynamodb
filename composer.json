@@ -1,10 +1,11 @@
 {
     "name": "alessandrominoccheri/broadway-dynamodb",
     "description": "DynamoDb store for broadway",
+    "license": "MIT",
     "authors": [
         {
             "name": "Alessandro Minoccheri",
-            "email": "alessandro@studiomado.it"
+            "email": "alessandro.minoccheri@gmail.com"
         }
     ],
     "require": {
