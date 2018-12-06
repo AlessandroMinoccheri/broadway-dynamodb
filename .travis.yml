@@ -1,0 +1,20 @@
+language: php
+
+matrix:
+  include:
+    - php: 7.0
+    - php: 7.1
+    - php: 7.2
+
+before_install:
+  # Disable XDebug speed up test execution.
+  - phpenv config-rm xdebug.ini || return 0
+
+install:
+  - travis_retry composer update
+  - composer info
+
+script:
+  - vendor/bin/phpunit
+  - git log $(git describe --abbrev=0 --tags)...HEAD --no-merges --pretty=format:"* [%h](http://github.com/${TRAVIS_REPO_SLUG}/commit/%H) %s (%cN)"
+
