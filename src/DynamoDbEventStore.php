@@ -13,9 +13,8 @@ use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
-use Broadway\EventStore\DynamoDb\Objects\ConvertAwsItemToArray;
 use Broadway\EventStore\DynamoDb\Objects\DeserializeEvent;
-use Broadway\EventStore\DynamoDb\Objects\ScanFilter;
+use Broadway\EventStore\DynamoDb\Expressions\CriteriaExpressionBuilder;
 use Broadway\EventStore\EventStore;
 use Broadway\EventStore\EventStreamNotFoundException;
 use Broadway\EventStore\EventVisitor;
@@ -24,7 +23,6 @@ use Broadway\EventStore\Management\Criteria;
 use Broadway\EventStore\Management\CriteriaNotSupportedException;
 use Broadway\EventStore\Management\EventStoreManagement;
 use Broadway\Serializer\Serializer;
-use Broadway\Domain\DateTime;
 use Ramsey\Uuid\Uuid;
 
 class DynamoDbEventStore implements EventStore, EventStoreManagement
@@ -72,9 +70,9 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
             'playhead' => 0
         ];
 
-        $scanFilter = new ScanFilter($fields);
+        $scanFilter = new CriteriaExpressionBuilder($fields);
 
-        $eav = $marshaler->marshalJson($scanFilter->getJson());
+        $eav = $marshaler->marshalJson($scanFilter->getExpressionAttributeValues());
 
         $items = $this->client->scan(array(
             'TableName' => $this->table,
@@ -108,9 +106,9 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
             'playhead' => $playhead
         ];
 
-        $scanFilter = new ScanFilter($fields);
+        $scanFilter = new CriteriaExpressionBuilder($fields);
 
-        $eav = $marshaler->marshalJson($scanFilter->getJson());
+        $eav = $marshaler->marshalJson($scanFilter->getExpressionAttributeValues());
 
         $items = $this->client->scan(array(
             'TableName' => $this->table,
@@ -179,15 +177,15 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         $fields = $this->convertCriteriaToArray($criteria);
 
 
-        $scanFilter = new ScanFilter($fields);
+        $scanFilter = new CriteriaExpressionBuilder($fields);
 
         $marshaler = new Marshaler();
-        $eav = $marshaler->marshalJson($scanFilter->getJson());
+        $eav = $marshaler->marshalJson($scanFilter->getExpressionAttributeValues());
 
         $items = $this->client->scan(array(
             'TableName' => $this->table,
-            'FilterExpression' => $scanFilter->getFilter(),
-            'ExpressionAttributeNames' => $scanFilter->getAttributeNames(),
+            'FilterExpression' => $scanFilter->getFilterExpression(),
+            'ExpressionAttributeNames' => $scanFilter->getExpressionAttributeNames(),
             "ExpressionAttributeValues" => $eav,
         ));
 
