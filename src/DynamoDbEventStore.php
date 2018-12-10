@@ -87,7 +87,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
 
         if (empty($events)) {
-            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->tableName));
+            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->table));
         }
 
         return new DomainEventStream($events);
@@ -123,7 +123,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
 
         if (empty($events)) {
-            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->tableName));
+            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->table));
         }
 
         return new DomainEventStream($events);
