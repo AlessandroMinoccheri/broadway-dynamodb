@@ -162,10 +162,16 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         $marshal = new Marshaler();
         $data = $marshal->marshalJson(json_encode($data));
 
-        $this->client->putItem(
+        $this->client->transactWriteItems(
             [
-                'TableName' => $this->table,
-                'Item' => $data
+                'TransactItems' => [
+                    [
+                        'Put' => [
+                            'TableName' => $this->table,
+                            'Item' => $data
+                        ]
+                    ]
+                ]
             ]
         );
     }

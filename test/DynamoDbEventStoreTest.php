@@ -26,6 +26,7 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
     {
         $dynamodb = new DynamoDbClient([
             'region'   => 'us-west-2',
+            'debug' => true,
             'version'  => 'latest',
             'endpoint' => 'http://localhost:8000',
             'credentials' => [
@@ -85,7 +86,9 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
         $playhead = 0;
         $metadata = new \Broadway\Domain\Metadata(['id' => $id, 'foo' => 'bar']);
-        $payload = new class(){};
+        $payload = new class ()
+        {
+        };
         $recordedOn = \Broadway\Domain\DateTime::now();
 
         $domainMessage = new DomainMessage(
@@ -111,7 +114,6 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals($payload, $event->getPayload());
             $this->assertEquals($recordedOn, $event->getRecordedOn());
         }
-
     }
 
     public function testInsertMessageAndLoadFromPlayhead()
@@ -119,7 +121,9 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
         $playhead = random_int(1, 9999);
         $metadata = new \Broadway\Domain\Metadata(['id' => $id, 'foo' => 'bar']);
-        $payload = new class(){};
+        $payload = new class ()
+        {
+        };
         $recordedOn = \Broadway\Domain\DateTime::now();
 
         $domainMessage = new DomainMessage(
@@ -151,7 +155,9 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
     {
         $playhead = random_int(1, 9999);
         $metadata = new \Broadway\Domain\Metadata(['id' => $id, 'foo' => 'bar']);
-        $payload = new class(){};
+        $payload = new class ()
+        {
+        };
         $recordedOn = \Broadway\Domain\DateTime::now();
 
         $domainMessage = new DomainMessage(
@@ -256,7 +262,7 @@ class RecordingEventVisitor implements EventVisitor
      */
     private $visitedEvents;
 
-    public function doWithEvent(DomainMessage $domainMessage) :void
+    public function doWithEvent(DomainMessage $domainMessage): void
     {
         $this->visitedEvents[] = $domainMessage;
     }
@@ -266,8 +272,9 @@ class RecordingEventVisitor implements EventVisitor
         return $this->visitedEvents;
     }
 
-    public function clearVisitedEvents() :void
+    public function clearVisitedEvents(): void
     {
         $this->visitedEvents = [];
     }
 }
+
