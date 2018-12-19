@@ -11,31 +11,25 @@ namespace Broadway\EventStore\DynamoDb\Objects;
 
 class ConvertAwsItemToArray
 {
+    private static $keyMap = ['S', 'SS', 'N', 'NS', 'B', 'BS'];
+
     public static function convert($item)
     {
-        if (empty($item)) return null;
+        if (empty($item)) {
+            return null;
+        }
 
         $converted = [];
         foreach ($item as $k => $v) {
-            if (isset($v['S'])) {
-                $converted[$k] = $v['S'];
+            $keyFound = false;
+            foreach (self::$keyMap as $key) {
+                if (isset($v[$key])) {
+                    $converted[$k] = $v[$key];
+                    $keyFound = true;
+                }
             }
-            else if (isset($v['SS'])) {
-                $converted[$k] = $v['SS'];
-            }
-            else if (isset($v['N'])) {
-                $converted[$k] = $v['N'];
-            }
-            else if (isset($v['NS'])) {
-                $converted[$k] = $v['NS'];
-            }
-            else if (isset($v['B'])) {
-                $converted[$k] = $v['B'];
-            }
-            else if (isset($v['BS'])) {
-                $converted[$k] = $v['BS'];
-            }
-            else {
+
+            if (!$keyFound) {
                 throw new \Exception('Not implemented type');
             }
         }
