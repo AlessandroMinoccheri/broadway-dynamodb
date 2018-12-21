@@ -19,7 +19,7 @@ class ConvertAwsItemToArray
             return null;
         }
 
-        $converted = [];
+        $converted = array();
         foreach ($item as $k => $v) {
             $keyFound = false;
             foreach (self::$keyMap as $key) {

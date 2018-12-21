@@ -23,7 +23,7 @@ class FilterExpression
         $this->expression .= ', ';
     }
 
-    public function addConditionOperator(string $condition)
+    public function addConditionOperator($condition)
     {
         $this->expression .= ' ' . $condition . ' ';
     }
@@ -33,14 +33,14 @@ class FilterExpression
         $this->expression .=  '#' . $field . ' IN(';
     }
 
-    public function addInFieldWithPosition(string $field, int $position)
+    public function addInFieldWithPosition($field, $position)
     {
         $positionField = $position + 1;
 
         $this->expression .= ':' . $field . $positionField;
     }
 
-    public function addField(string $field)
+    public function addField($field)
     {
         $this->expression .=  '#' . $field . ' = :' . $field;
     }
@@ -50,7 +50,7 @@ class FilterExpression
         $this->expression .= ')';
     }
 
-    public function getExpression() :string
+    public function getExpression()
     {
         return $this->expression;
     }

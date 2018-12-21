@@ -48,17 +48,17 @@ class CriteriaExpressionBuilder
         $this->expressionAttributeValues->close();
     }
 
-    public function getExpressionAttributeValues() :string
+    public function getExpressionAttributeValues()
     {
         return $this->expressionAttributeValues->getExpression();
     }
 
-    public function getExpressionAttributeNames() :array
+    public function getExpressionAttributeNames()
     {
         return $this->expressionAttributeNames->getExpression();
     }
 
-    public function getFilterExpression() :string
+    public function getFilterExpression()
     {
         return $this->filterExpression->getExpression();
     }

@@ -23,7 +23,7 @@ class ExpressionAttributeValues
         $this->expression .= ',';
     }
 
-    public function addFieldWithPosition(string $field, int $position, $value)
+    public function addFieldWithPosition($field, $position, $value)
     {
         $positionField = $position + 1;
 
@@ -32,7 +32,7 @@ class ExpressionAttributeValues
         $this->expression .= '":' . $field. $positionField . '":'. $value;
     }
 
-    public function addField(string $field, $value)
+    public function addField($field, $value)
     {
         $value = $this->addQuoteIfIsString($value);
 
@@ -44,7 +44,7 @@ class ExpressionAttributeValues
         $this->expression .= '}';
     }
 
-    public function getExpression() :string
+    public function getExpression()
     {
         return $this->expression;
     }

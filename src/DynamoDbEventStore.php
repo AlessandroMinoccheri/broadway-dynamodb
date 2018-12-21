@@ -46,7 +46,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         DynamoDbClient $dynamoDbClient,
         Serializer $payloadSerializer,
         Serializer $metadataSerializer,
-        string $table
+        $table
     )
     {
         $this->client = $dynamoDbClient;
@@ -61,7 +61,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
      *
      * @return DomainEventStream
      */
-    public function load($id): DomainEventStream
+    public function load($id)
     {
         $marshaler = new Marshaler();
 
@@ -97,7 +97,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
      * @param mixed $id
      * @param int $playhead
      */
-    public function loadFromPlayhead($id, int $playhead): DomainEventStream
+    public function loadFromPlayhead($id, $playhead)
     {
         $marshaler = new Marshaler();
 
@@ -199,7 +199,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         return $items;
     }
 
-    private function convertCriteriaToArray(Criteria $criteria) :array
+    private function convertCriteriaToArray(Criteria $criteria)
     {
         $findBy = [];
         if ($criteria->getAggregateRootIds()) {

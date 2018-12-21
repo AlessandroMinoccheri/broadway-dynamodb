@@ -15,15 +15,15 @@ class ExpressionAttributeNames
 
     public function __construct()
     {
-        $this->expression = [];
+        $this->expression = array();
     }
 
-    public function addField(string $field)
+    public function addField($field)
     {
         $this->expression['#' . $field] = $field;
     }
 
-    public function getExpression() :array
+    public function getExpression()
     {
         return $this->expression;
     }

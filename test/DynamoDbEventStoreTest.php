@@ -5,11 +5,16 @@ namespace Tests;
 use Aws\DynamoDb\DynamoDbClient;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
+use Broadway\Domain\Metadata;
 use Broadway\EventStore\DynamoDb\DynamoDbEventStore;
 use Broadway\EventStore\DynamoDb\Objects\DeserializeEvent;
 use Broadway\EventStore\EventVisitor;
 use Broadway\EventStore\Management\Criteria;
-use Broadway\Serializer\ReflectionSerializer;
+use Broadway\Serializer\Serializable;
+use Broadway\Serializer\SerializationException;
+use Broadway\Serializer\Serializer;
+use Broadway\Serializer\SimpleInterfaceSerializer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Created by PhpStorm.
@@ -18,7 +23,7 @@ use Broadway\Serializer\ReflectionSerializer;
  * Time: 15:26
  */
 
-class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
+class DynamoDbEventStoreTest extends TestCase
 {
     private $dynamoDbEventStore;
 
@@ -74,8 +79,8 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
 
         $this->dynamoDbEventStore = new DynamoDbEventStore(
             $dynamodb,
-            new ReflectionSerializer(),
-            new ReflectionSerializer(),
+            new SimpleInterfaceSerializer(),
+            new SimpleInterfaceSerializer(),
             'dynamo_table'
         );
     }
@@ -85,7 +90,7 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
         $playhead = 0;
         $metadata = new \Broadway\Domain\Metadata(['id' => $id, 'foo' => 'bar']);
-        $payload = new class(){};
+        $payload = new SerializableClass();
         $recordedOn = \Broadway\Domain\DateTime::now();
 
         $domainMessage = new DomainMessage(
@@ -119,7 +124,7 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
         $playhead = random_int(1, 9999);
         $metadata = new \Broadway\Domain\Metadata(['id' => $id, 'foo' => 'bar']);
-        $payload = new class(){};
+        $payload = new SerializableClass();
         $recordedOn = \Broadway\Domain\DateTime::now();
 
         $domainMessage = new DomainMessage(
@@ -151,7 +156,7 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
     {
         $playhead = random_int(1, 9999);
         $metadata = new \Broadway\Domain\Metadata(['id' => $id, 'foo' => 'bar']);
-        $payload = new class(){};
+        $payload = new SerializableClass();
         $recordedOn = \Broadway\Domain\DateTime::now();
 
         $domainMessage = new DomainMessage(
@@ -188,12 +193,58 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $events['Items']);
 
         foreach ($events['Items'] as $event) {
-            $eventDeserialized = DeserializeEvent::deserialize($event, new ReflectionSerializer(), new ReflectionSerializer());
+            $eventDeserialized = DeserializeEvent::deserialize($event, new SerializerClass(), new SerializerClass());
             $this->assertTrue($eventDeserialized->getId() === $id || $eventDeserialized->getId() === $id2);
         }
     }
 }
 
+class SerializableClass implements Serializable
+{
+
+    /**
+     * @return mixed The object instance
+     */
+    public static function deserialize(array $data)
+    {
+        return new self;
+    }
+
+    /**
+     * @return array
+     */
+    public function serialize()
+    {
+        return array();
+    }
+}
+
+class SerializerClass implements Serializer
+{
+
+
+    /**
+     * @throws SerializationException
+     *
+     * @return array
+     */
+    public function serialize($object)
+    {
+        return array();
+    }
+
+    /**
+     * @param array $serializedObject
+     *
+     * @throws SerializationException
+     *
+     * @return mixed
+     */
+    public function deserialize(array $serializedObject)
+    {
+        return new Metadata();
+    }
+}
 
 class RecordingEventVisitor implements EventVisitor
 {
