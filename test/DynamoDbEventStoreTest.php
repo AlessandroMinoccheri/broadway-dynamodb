@@ -183,7 +183,8 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
 
         $eventVisitor = new RecordingEventVisitor();
 
-        $events = $this->dynamoDbEventStore->visitEvents($criteria, $eventVisitor);
+        $this->dynamoDbEventStore->visitEvents($criteria, $eventVisitor);
+        $events = $this->dynamoDbEventStore->getItems();
 
         $this->assertCount(2, $events['Items']);
 
@@ -191,6 +192,59 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
             $eventDeserialized = DeserializeEvent::deserialize($event, new ReflectionSerializer(), new ReflectionSerializer());
             $this->assertTrue($eventDeserialized->getId() === $id || $eventDeserialized->getId() === $id2);
         }
+    }
+
+    /**
+     * @expectedException Broadway\EventStore\EventStreamNotFoundException
+     */
+    public function testEmptyEventsThrowExceptionOnLoad()
+    {
+        $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
+
+        $eventStream = new DomainEventStream([]);
+
+        $this->dynamoDbEventStore->append($id, $eventStream);
+
+        $this->dynamoDbEventStore->load($id);
+    }
+
+    /**
+     * @expectedException Broadway\EventStore\EventStreamNotFoundException
+     */
+    public function testEmptyEventsThrowExceptionOnLoadFromPlayhead()
+    {
+        $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
+        $playhead = random_int(1, 9999);
+
+        $eventStream = new DomainEventStream([]);
+
+        $this->dynamoDbEventStore->append($id, $eventStream);
+
+        $this->dynamoDbEventStore->loadFromPlayhead($id, $playhead);
+    }
+
+    /**
+     * @expectedException Broadway\EventStore\Management\CriteriaNotSupportedException
+     */
+    public function testInsertMessageAndVisitEventsWithAggregateRootTypesThrowException()
+    {
+        $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
+        $id2 =  \Ramsey\Uuid\Uuid::uuid4()->toString();
+
+        $eventStream = $this->appendEvent($id);
+        $this->dynamoDbEventStore->append($id, $eventStream);
+
+        $eventStream = $this->appendEvent($id2);
+        $this->dynamoDbEventStore->append($id2, $eventStream);
+
+        $criteria = Criteria::create()->withAggregateRootTypes([
+            'type1',
+            'type2',
+        ]);
+
+        $eventVisitor = new RecordingEventVisitor();
+
+        $this->dynamoDbEventStore->visitEvents($criteria, $eventVisitor);
     }
 }
 
@@ -202,7 +256,7 @@ class RecordingEventVisitor implements EventVisitor
      */
     private $visitedEvents;
 
-    public function doWithEvent(DomainMessage $domainMessage)
+    public function doWithEvent(DomainMessage $domainMessage) :void
     {
         $this->visitedEvents[] = $domainMessage;
     }
@@ -212,7 +266,7 @@ class RecordingEventVisitor implements EventVisitor
         return $this->visitedEvents;
     }
 
-    public function clearVisitedEvents()
+    public function clearVisitedEvents() :void
     {
         $this->visitedEvents = [];
     }

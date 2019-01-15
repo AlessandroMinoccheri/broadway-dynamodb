@@ -41,6 +41,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
      * @var string
      */
     private $table;
+    private $items;
 
     public function __construct(
         DynamoDbClient $dynamoDbClient,
@@ -135,7 +136,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
      *
      * @throws DuplicatePlayheadException
      */
-    public function append($id, DomainEventStream $eventStream)
+    public function append($id, DomainEventStream $eventStream) : void
     {
         //TODO: use transactions
         foreach ($eventStream as $domainMessage) {
@@ -166,7 +167,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         );
     }
 
-    public function visitEvents(Criteria $criteria, EventVisitor $eventVisitor)
+    public function visitEvents(Criteria $criteria, EventVisitor $eventVisitor): void
     {
         if ($criteria->getAggregateRootTypes()) {
             throw new CriteriaNotSupportedException(
@@ -182,7 +183,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         $marshaler = new Marshaler();
         $eav = $marshaler->marshalJson($scanFilter->getExpressionAttributeValues());
 
-        $items = $this->client->scan(array(
+        $this->items = $this->client->scan(array(
             'TableName' => $this->table,
             'FilterExpression' => $scanFilter->getFilterExpression(),
             'ExpressionAttributeNames' => $scanFilter->getExpressionAttributeNames(),
@@ -190,13 +191,11 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         ));
 
 
-        foreach ($items['Items'] as $event) {
+        foreach ($this->items['Items'] as $event) {
             $eventVisitor->doWithEvent(
                 DeserializeEvent::deserialize($event, $this->payloadSerializer, $this->metadataSerializer)
             );
         }
-
-        return $items;
     }
 
     private function convertCriteriaToArray(Criteria $criteria) :array
@@ -210,5 +209,10 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
 
         return $findBy;
+    }
+
+    public function getItems()
+    {
+        return $this->items;
     }
 }
