@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Objects;
+
 use Broadway\EventStore\DynamoDb\Objects\ConvertAwsItemToArray;
 use PHPUnit\Framework\TestCase;
 
