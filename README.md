@@ -117,3 +117,11 @@ class BroadwayServiceProvider extends ServiceProvider
         ]);
     }
 ```
+
+## Debug
+
+In this library is installed PHPStan, so if you want to check the code you can launch inside your cli:
+
+```
+vendor/bin/phpstan analyse 
+```
