@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "broadway/broadway": "~1.0.0",
+        "broadway/broadway": "^1.0",
         "aws/aws-sdk-php": "^3.81"
     },
     "require-dev": {
