@@ -18,6 +18,7 @@ install:
 
 script:
   - vendor/bin/phpunit
+  - vendor/bin/phpstan analyse 
   - git log $(git describe --abbrev=0 --tags)...HEAD --no-merges --pretty=format:"* [%h](http://github.com/${TRAVIS_REPO_SLUG}/commit/%H) %s (%cN)"
 
 addons:
