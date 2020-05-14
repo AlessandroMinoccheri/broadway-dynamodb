@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: alessandrominoccheri
@@ -48,10 +49,8 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         Serializer $payloadSerializer,
         Serializer $metadataSerializer,
         string $table
-    )
-    {
+    ) {
         $this->client = $dynamoDbClient;
-
         $this->payloadSerializer = $payloadSerializer;
         $this->metadataSerializer = $metadataSerializer;
         $this->table = $table;
@@ -88,7 +87,11 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
 
         if (empty($events)) {
-            throw new EventStreamNotFoundException(sprintf('EventStream not found for aggregate with id %s for table %s', $id, $this->table));
+            throw new EventStreamNotFoundException(sprintf(
+                'EventStream not found for aggregate with id %s for table %s',
+                $id,
+                $this->table
+            ));
         }
 
         return new DomainEventStream($events);
@@ -136,7 +139,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
      *
      * @throws DuplicatePlayheadException
      */
-    public function append($id, DomainEventStream $eventStream) : void
+    public function append($id, DomainEventStream $eventStream): void
     {
         //TODO: use transactions
         foreach ($eventStream as $domainMessage) {
@@ -144,7 +147,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
     }
 
-    private function insertMessage(DomainMessage $domainMessage)
+    private function insertMessage(DomainMessage $domainMessage): void
     {
         $data = [
             'id' => Uuid::uuid4()->toString(),
@@ -176,8 +179,6 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
 
         $fields = $this->convertCriteriaToArray($criteria);
-
-
         $scanFilter = new CriteriaExpressionBuilder($fields);
 
         $marshaler = new Marshaler();
@@ -190,7 +191,6 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
             "ExpressionAttributeValues" => $eav,
         ));
 
-
         foreach ($this->items['Items'] as $event) {
             $eventVisitor->doWithEvent(
                 DeserializeEvent::deserialize($event, $this->payloadSerializer, $this->metadataSerializer)
@@ -198,7 +198,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         }
     }
 
-    private function convertCriteriaToArray(Criteria $criteria) :array
+    private function convertCriteriaToArray(Criteria $criteria): array
     {
         $findBy = [];
         if ($criteria->getAggregateRootIds()) {

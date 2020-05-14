@@ -15,7 +15,11 @@ use Broadway\Serializer\Serializer;
 
 class DeserializeEvent
 {
-    public static function deserialize($row, Serializer $metadataSerializer, Serializer $payloadSerializer)
+    public static function deserialize(
+        $row, 
+        Serializer $metadataSerializer, 
+        Serializer $payloadSerializer
+    ): DomainMessage
     {
         $eventData = ConvertAwsItemToArray::convert($row);
 
