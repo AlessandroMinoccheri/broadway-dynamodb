@@ -125,3 +125,16 @@ In this library is installed PHPStan, so if you want to check the code you can l
 ```
 vendor/bin/phpstan analyse 
 ```
+
+## Tests
+
+It's really important that all tests are green. To run tests you need to have docker up so you need to:
+
+```
+docker-compose up -d
+./vendor/bin/phpunit
+```
+
+
+
+

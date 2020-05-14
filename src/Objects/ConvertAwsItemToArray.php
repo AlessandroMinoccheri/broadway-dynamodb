@@ -13,7 +13,7 @@ class ConvertAwsItemToArray
 {
     private static $keyMap = ['S', 'SS', 'N', 'NS', 'B', 'BS'];
 
-    public static function convert($item)
+    public static function convert($item): ?array
     {
         if (empty($item)) {
             return null;
