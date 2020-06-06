@@ -2,9 +2,9 @@ language: php
 
 matrix:
   include:
-    - php: 7.1
     - php: 7.2
     - php: 7.3
+    - php: 7.4
 
 before_script:
   - wget http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest.tar.gz -O /tmp/dynamodb_local_latest.tar.gz
