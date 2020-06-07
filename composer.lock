@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "18722a280e5d6701c33a5cf0ba3f9caf",
+    "content-hash": "a71d5e0c8c43917060a7dcdb69c03ca1",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.140.1",
+            "version": "3.140.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "52645498aea4dd2d090884322121270daf3e0f06"
+                "reference": "7e37960c1103ee211932be51b2282b41c948a5f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/52645498aea4dd2d090884322121270daf3e0f06",
-                "reference": "52645498aea4dd2d090884322121270daf3e0f06",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/7e37960c1103ee211932be51b2282b41c948a5f0",
+                "reference": "7e37960c1103ee211932be51b2282b41c948a5f0",
                 "shasum": ""
             },
             "require": {
@@ -88,7 +88,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2020-06-04T18:19:47+00:00"
+            "time": "2020-06-05T18:12:25+00:00"
         },
         {
             "name": "beberlei/assert",
@@ -154,27 +154,27 @@
         },
         {
             "name": "broadway/broadway",
-            "version": "2.2.1",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/broadway/broadway.git",
-                "reference": "dbb645c40bd706aca93c3e791ab307b319708537"
+                "reference": "cd8783bba1d8c2267362055d9e5e7dcd27abeab5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/broadway/broadway/zipball/dbb645c40bd706aca93c3e791ab307b319708537",
-                "reference": "dbb645c40bd706aca93c3e791ab307b319708537",
+                "url": "https://api.github.com/repos/broadway/broadway/zipball/cd8783bba1d8c2267362055d9e5e7dcd27abeab5",
+                "reference": "cd8783bba1d8c2267362055d9e5e7dcd27abeab5",
                 "shasum": ""
             },
             "require": {
-                "beberlei/assert": "~3.0",
-                "broadway/uuid-generator": "~0.4.0",
+                "beberlei/assert": "^3.0",
+                "broadway/uuid-generator": "^1.0",
                 "php": ">=7.2"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.1",
-                "malukenho/docheader": "^0.1.7",
+                "broadway/coding-standard": "^1.0",
                 "monolog/monolog": "~1.8",
+                "phpstan/phpstan": "@stable",
                 "phpunit/phpunit": "^8.0",
                 "ramsey/uuid": "^3.0"
             },
@@ -188,7 +188,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0.x-dev"
+                    "dev-master": "3.0.x-dev"
                 }
             },
             "autoload": {
@@ -233,33 +233,40 @@
                 "domain-driven design",
                 "event sourcing"
             ],
-            "time": "2020-02-17T08:45:57+00:00"
+            "time": "2020-03-06T17:11:59+00:00"
         },
         {
             "name": "broadway/uuid-generator",
-            "version": "0.4.0",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/broadway/broadway-uuid-generator.git",
-                "reference": "3c5307e62975113d370d18d36c9fcd792b21032a"
+                "reference": "908de6999cdb77f1b323abd3e64e8ce6f86db3e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/broadway/broadway-uuid-generator/zipball/3c5307e62975113d370d18d36c9fcd792b21032a",
-                "reference": "3c5307e62975113d370d18d36c9fcd792b21032a",
+                "url": "https://api.github.com/repos/broadway/broadway-uuid-generator/zipball/908de6999cdb77f1b323abd3e64e8ce6f86db3e5",
+                "reference": "908de6999cdb77f1b323abd3e64e8ce6f86db3e5",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9"
+                "php": ">=7.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8",
+                "broadway/coding-standard": "^1.0",
+                "phpstan/phpstan": "@stable",
+                "phpunit/phpunit": "^8.0",
                 "ramsey/uuid": "^3.0"
             },
             "suggest": {
                 "ramsey/uuid": "Allows creating UUIDs"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Broadway\\UuidGenerator\\": "src/Broadway/UuidGenerator"
@@ -270,7 +277,7 @@
                 "MIT"
             ],
             "description": "UUID generator for broadway/broadway.",
-            "time": "2016-12-14T10:47:27+00:00"
+            "time": "2020-03-06T10:09:30+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2497,6 +2504,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-08-09T05:50:03+00:00"
         },
         {
@@ -3698,7 +3706,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.1"
+        "php": ">=7.4"
     },
     "platform-dev": []
 }
