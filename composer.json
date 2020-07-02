@@ -11,7 +11,7 @@
     "require": {
         "php": ">=7.4",
         "broadway/broadway": "^2.0",
-        "aws/aws-sdk-php": "^3.82"
+        "aws/aws-sdk-php": "<=3.140"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0",
