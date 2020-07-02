@@ -16,7 +16,7 @@ $ composer require alessandrominoccheri/broadway-dynamodb
 
 ## Symfony
 
-To install this library into a Symfony 4 application you can check this repository:
+To install this library into a Symfony 5 application you can check this repository:
 
 [Symfony demo](https://github.com/AlessandroMinoccheri/broadway-dynamodb-demo)
 
