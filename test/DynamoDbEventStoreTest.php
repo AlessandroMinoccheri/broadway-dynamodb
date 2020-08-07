@@ -11,13 +11,6 @@ use Broadway\EventStore\EventVisitor;
 use Broadway\EventStore\Management\Criteria;
 use Broadway\Serializer\ReflectionSerializer;
 
-/**
- * Created by PhpStorm.
- * User: alessandrominoccheri
- * Date: 2018-12-04
- * Time: 15:26
- */
-
 class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
 {
     private $dynamoDbEventStore;
@@ -264,17 +257,14 @@ class RecordingEventVisitor implements EventVisitor
 
     public function doWithEvent(DomainMessage $domainMessage): void
     {
-        $this->visitedEvents[] = $domainMessage;
     }
 
     public function getVisitedEvents()
     {
-        return $this->visitedEvents;
     }
 
     public function clearVisitedEvents(): void
     {
-        $this->visitedEvents = [];
     }
 }
 
