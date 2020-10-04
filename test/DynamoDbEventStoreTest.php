@@ -7,16 +7,20 @@ use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\EventStore\DynamoDb\DynamoDbEventStore;
 use Broadway\EventStore\DynamoDb\Objects\DeserializeEvent;
+use Broadway\EventStore\EventStreamNotFoundException;
 use Broadway\EventStore\EventVisitor;
 use Broadway\EventStore\Management\Criteria;
+use Broadway\EventStore\Management\CriteriaNotSupportedException;
 use Broadway\Serializer\ReflectionSerializer;
 
 class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
 {
     private $dynamoDbEventStore;
 
-    public function setUp()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $dynamodb = new DynamoDbClient([
             'region'   => 'us-west-2',
             'debug' => true,
@@ -193,9 +197,6 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @expectedException Broadway\EventStore\EventStreamNotFoundException
-     */
     public function testEmptyEventsThrowExceptionOnLoad()
     {
         $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -204,12 +205,11 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
 
         $this->dynamoDbEventStore->append($id, $eventStream);
 
+        $this->expectException(EventStreamNotFoundException::class);
+
         $this->dynamoDbEventStore->load($id);
     }
 
-    /**
-     * @expectedException Broadway\EventStore\EventStreamNotFoundException
-     */
     public function testEmptyEventsThrowExceptionOnLoadFromPlayhead()
     {
         $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -219,12 +219,11 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
 
         $this->dynamoDbEventStore->append($id, $eventStream);
 
+        $this->expectException(EventStreamNotFoundException::class);
+
         $this->dynamoDbEventStore->loadFromPlayhead($id, $playhead);
     }
 
-    /**
-     * @expectedException Broadway\EventStore\Management\CriteriaNotSupportedException
-     */
     public function testInsertMessageAndVisitEventsWithAggregateRootTypesThrowException()
     {
         $id =  \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -242,6 +241,8 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $eventVisitor = new RecordingEventVisitor();
+
+        $this->expectException(CriteriaNotSupportedException::class);
 
         $this->dynamoDbEventStore->visitEvents($criteria, $eventVisitor);
     }

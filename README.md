@@ -135,6 +135,10 @@ docker-compose up -d
 ./vendor/bin/phpunit
 ```
 
+In this library is installed Psalm, so if you want to check the code you can launch inside your cli:
 
+```
+vendor/bin/psalm
+```
 
 
