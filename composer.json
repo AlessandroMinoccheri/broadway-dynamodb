@@ -14,10 +14,11 @@
         "aws/aws-sdk-php": "<=3.140"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.0",
         "ramsey/uuid": "^3.3",
         "broadway/uuid-generator": "^1.0",
-        "phpstan/phpstan": "^0.11.1"
+        "phpunit/phpunit": "^9.4",
+        "phpstan/phpstan": "^0.12.48",
+        "vimeo/psalm": "^3.16"
     },
     "autoload": {
         "psr-4": {

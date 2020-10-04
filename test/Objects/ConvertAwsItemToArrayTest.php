@@ -20,11 +20,9 @@ class ConvertAwsItemToArrayTest extends TestCase
         $this->assertNull($resultConverted);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testThrowExceptionIfTypeNotFound()
     {
+        $this->expectException(\Exception::class);
         ConvertAwsItemToArray::convert([['notExistingKey' => 'foo']]);
     }
 

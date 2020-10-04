@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: alessandrominoccheri
@@ -16,10 +17,10 @@ class ExpressionAttributeValuesTest extends TestCase
 {
     private $expressionAttributeValues;
 
-    public function setUp()
+    protected function setUp(): void
     {
+        parent::setUp();
         $this->expressionAttributeValues = new ExpressionAttributeValues();
-
     }
 
     public function testCreateExpressionAttributeValues()
@@ -64,3 +65,4 @@ class ExpressionAttributeValuesTest extends TestCase
         $this->assertEquals('{}', $this->expressionAttributeValues->getExpression());
     }
 }
+

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: alessandrominoccheri
@@ -16,8 +17,9 @@ class FilterExpressionTest extends TestCase
 {
     private $filterExpression;
 
-    public function setUp()
+    protected function setUp(): void
     {
+        parent::setUp();
         $this->filterExpression = new FilterExpression();
     }
 
@@ -76,3 +78,4 @@ class FilterExpressionTest extends TestCase
         $this->assertEquals($expected, $this->filterExpression->getExpression());
     }
 }
+
