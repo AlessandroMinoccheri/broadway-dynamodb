@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: alessandrominoccheri
@@ -16,19 +17,48 @@ use Broadway\Serializer\Serializer;
 class DeserializeEvent
 {
     public static function deserialize(
-        $row, 
-        Serializer $metadataSerializer, 
+        $row,
+        Serializer $metadataSerializer,
         Serializer $payloadSerializer
-    ): DomainMessage
-    {
+    ): DomainMessage {
         $eventData = ConvertAwsItemToArray::convert($row);
 
+        if (null === $eventData) {
+            throw new \Exception('EventData cannot be null');
+        }
+
+        $uuid = $eventData['uuid'];
+        $playhead = $eventData['playhead'];
+        $payload = $eventData['payload'];
+        $metadata = $eventData['metadata'];
+        $recordedOn = $eventData['recorded_on'];
+
+        if (null === $uuid) {
+            throw new \Exception('uuid key not found');
+        }
+
+        if (null === $playhead) {
+            throw new \Exception('playhead key not found');
+        }
+
+        if (null === $payload) {
+            throw new \Exception('payload key not found');
+        }
+
+        if (null === $metadata) {
+            throw new \Exception('metadata key not found');
+        }
+
+        if (null === $recordedOn) {
+            throw new \Exception('recorded_on key not found');
+        }
+
         return new DomainMessage(
-            $eventData['uuid'],
-            (int)$eventData['playhead'],
-            $metadataSerializer->deserialize(json_decode($eventData['metadata'], true)),
-            $payloadSerializer->deserialize(json_decode($eventData['payload'], true)),
-            DateTime::fromString($eventData['recorded_on'])
+            $uuid,
+            (int) $playhead,
+            $metadataSerializer->deserialize(json_decode($metadata, true)),
+            $payloadSerializer->deserialize(json_decode($payload, true)),
+            DateTime::fromString($recordedOn)
         );
     }
 }

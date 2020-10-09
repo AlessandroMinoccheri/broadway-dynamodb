@@ -74,7 +74,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
 
         $eav = $marshaler->marshalJson($scanFilter->getExpressionAttributeValues());
 
-        $items = $this->client->scan(array(
+        $itemsCollection = $this->client->scan(array(
             'TableName' => $this->table,
             'FilterExpression' => '#uuid = :uuid and playhead = :playhead',
             'ExpressionAttributeNames' => ['#uuid' => 'uuid'],
@@ -82,7 +82,17 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         ));
 
         $events = [];
-        foreach ($items['Items'] as $item) {
+        $items = $itemsCollection['Items'];
+
+        if (null === $items) {
+            throw new EventStreamNotFoundException(sprintf(
+                'EventStream not found for aggregate with id %s for table %s',
+                $id,
+                $this->table
+            ));
+        }
+
+        foreach ($items as $item) {
             $events[] = DeserializeEvent::deserialize($item, $this->payloadSerializer, $this->metadataSerializer);
         }
 
@@ -114,7 +124,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
 
         $eav = $marshaler->marshalJson($scanFilter->getExpressionAttributeValues());
 
-        $items = $this->client->scan(array(
+        $itemsCollection = $this->client->scan(array(
             'TableName' => $this->table,
             'FilterExpression' => '#uuid = :uuid and playhead = :playhead',
             'ExpressionAttributeNames' => ['#uuid' => 'uuid'],
@@ -122,7 +132,17 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         ));
 
         $events = [];
-        foreach ($items['Items'] as $item) {
+        $items = $itemsCollection['Items'];
+
+        if (null === $items) {
+            throw new EventStreamNotFoundException(sprintf(
+                'EventStream not found for aggregate with id %s for table %s',
+                $id,
+                $this->table
+            ));
+        }
+
+        foreach ($items as $item) {
             $events[] = DeserializeEvent::deserialize($item, $this->payloadSerializer, $this->metadataSerializer);
         }
 
@@ -197,14 +217,31 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         $marshaler = new Marshaler();
         $eav = $marshaler->marshalJson($scanFilter->getExpressionAttributeValues());
 
-        $this->items = $this->client->scan(array(
+        $itemsCollection = $this->client->scan(array(
             'TableName' => $this->table,
             'FilterExpression' => $scanFilter->getFilterExpression(),
             'ExpressionAttributeNames' => $scanFilter->getExpressionAttributeNames(),
             "ExpressionAttributeValues" => $eav,
         ));
 
-        foreach ($this->items['Items'] as $event) {
+        $this->items = $itemsCollection;
+
+        if (null === $this->items) {
+            throw new EventStreamNotFoundException(sprintf(
+                'Items not found for table %s',
+                $this->table
+            ));
+        }
+
+        $events = $this->items['Items'];
+        if (null === $events) {
+            throw new EventStreamNotFoundException(sprintf(
+                'Items not found for table %s',
+                $this->table
+            ));
+        }
+
+        foreach ($events as $event) {
             $eventVisitor->doWithEvent(
                 DeserializeEvent::deserialize($event, $this->payloadSerializer, $this->metadataSerializer)
             );
