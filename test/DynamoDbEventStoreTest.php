@@ -189,6 +189,11 @@ class DynamoDbEventStoreTest extends \PHPUnit\Framework\TestCase
         $this->dynamoDbEventStore->visitEvents($criteria, $eventVisitor);
         $events = $this->dynamoDbEventStore->getItems();
 
+        var_dump($events);
+
+
+
+
         $this->assertCount(2, $events['Items']);
 
         foreach ($events['Items'] as $event) {

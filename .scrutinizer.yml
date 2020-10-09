@@ -8,10 +8,16 @@ build:
     override:
       - command: 'docker-compose up -d'
       -
-        command: 'vendor/bin/phpunit --coverage-clover=some-file'
+        command: 'vendor/bin/phpunit --coverage-clover=coverage-clover'
         coverage:
-          file: 'some-file'
-          format: 'clover'
+          file: 'coverage-clover'
+          format: 'php-clover'
 filter:
   excluded_paths:
     - "test/"
+
+checks:
+  php:
+    code_rating: true
+    duplication: true
+
