@@ -10,8 +10,8 @@ build:
       -
         command: 'vendor/bin/phpunit --coverage-clover=coverage-clover'
         coverage:
-          file: 'coverage-clover'
-          format: 'php-clover'
+          file: '.coverage-clover'
+          format: 'clover'
 filter:
   excluded_paths:
     - "test/"
