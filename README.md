@@ -1,4 +1,8 @@
-Installation:
+# Broadway-dynamodb
+
+This library is an event store implementation for (Broadway)[https://github.com/broadway/broadway] using Amazon DynamoDB.
+
+## Installation:
 -------------
 
 [![Latest Stable Version](https://poser.pugx.org/AlessandroMinoccheri/broadway-dynamodb/v/stable.svg)](https://packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
