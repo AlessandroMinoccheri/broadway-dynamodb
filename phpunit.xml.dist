@@ -11,7 +11,7 @@
          bootstrap="vendor/autoload.php"
 >
     <testsuites>
-        <testsuite name="Broadway DynaomDb Event store Test Suite">
+        <testsuite name="Broadway DynamoDb Event store Test Suite">
             <directory>./test/</directory>
             <directory>./examples/</directory>
         </testsuite>
@@ -22,4 +22,9 @@
             <group>mongodb</group>
         </exclude>
     </groups>
+    <coverage>
+        <include>
+            <directory>./src/</directory>
+        </include>
+    </coverage>
 </phpunit>
