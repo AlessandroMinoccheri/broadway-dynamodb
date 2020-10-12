@@ -5,10 +5,10 @@ This library is an event store implementation for (Broadway)[https://github.com/
 ## Installation:
 -------------
 
-[![Latest Stable Version](https://poser.pugx.org/AlessandroMinoccheri/broadway-dynamodb/v/stable.svg)](https://packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
-[![License](https://poser.pugx.org/AlessandroMinoccheri/broadway-dynamodb/license.svg)](https://packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
-[![Build Status](https://api.travis-ci.org/AlessandroMinoccheri/broadway-dynamodb.png)](https://travis-ci.org/AlessandroMinoccheri/broadway-dynamodb)
-[![Total Downloads](https://poser.pugx.org/AlessandroMinoccheri/broadway-dynamodb/d/total.png)](https://packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
+[![Latest Stable Version](https://poser.pugx.org/alessandrominoccheri/broadway-dynamodb/v)](//packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
+[![License](https://poser.pugx.org/alessandrominoccheri/broadway-dynamodb/license)](//packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
+[![Build Status](https://github.com/alessandrominoccheri/broadway-dynamodb/workflows/CI/badge.svg)](https://github.com/alessandrominoccheri/broadway-dynamodb/workflows/CI/badge.svg)
+[![Total Downloads](https://poser.pugx.org/alessandrominoccheri/broadway-dynamodb/downloads)](//packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlessandroMinoccheri/broadway-dynamodb/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AlessandroMinoccheri/broadway-dynamodb/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/AlessandroMinoccheri/broadway-dynamodb/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/AlessandroMinoccheri/broadway-dynamodb/?branch=master)
 
