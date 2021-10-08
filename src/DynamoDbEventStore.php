@@ -12,6 +12,7 @@ namespace Broadway\EventStore\DynamoDb;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
+use Aws\Result;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
 use Broadway\EventStore\DynamoDb\Objects\DeserializeEvent;
@@ -28,20 +29,15 @@ use Ramsey\Uuid\Uuid;
 
 class DynamoDbEventStore implements EventStore, EventStoreManagement
 {
-
+    /** @var DynamoDbClient  $client*/
     private $client;
-    /**
-     * @var Serializer
-     */
+    /** @var Serializer */
     private $payloadSerializer;
-    /**
-     * @var Serializer
-     */
+    /** @var Serializer */
     private $metadataSerializer;
-    /**
-     * @var string
-     */
+    /** @var string */
     private $table;
+    /** @var Result|null */
     private $items;
 
     public function __construct(
@@ -261,7 +257,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
         return $findBy;
     }
 
-    public function getItems()
+    public function getItems(): ?Result
     {
         return $this->items;
     }
