@@ -15,11 +15,17 @@
             <directory>./test/</directory>
         </testsuite>
     </testsuites>
-    
+
     <groups>
         <exclude>
             <group>functional</group>
             <group>mongodb</group>
         </exclude>
     </groups>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
 </phpunit>
