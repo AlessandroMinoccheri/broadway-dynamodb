@@ -9,7 +9,6 @@ This library is an event store implementation for (Broadway)[https://github.com/
 [![License](https://poser.pugx.org/alessandrominoccheri/broadway-dynamodb/license)](//packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
 [![Build Status](https://github.com/alessandrominoccheri/broadway-dynamodb/workflows/CI/badge.svg)](https://github.com/alessandrominoccheri/broadway-dynamodb/workflows/CI/badge.svg)
 [![Total Downloads](https://poser.pugx.org/alessandrominoccheri/broadway-dynamodb/downloads)](//packagist.org/packages/alessandrominoccheri/broadway-dynamodb)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlessandroMinoccheri/broadway-dynamodb/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AlessandroMinoccheri/broadway-dynamodb/?branch=master)
 [![codecov](https://codecov.io/gh/AlessandroMinoccheri/broadway-dynamodb/branch/master/graph/badge.svg)](https://codecov.io/gh/AlessandroMinoccheri/broadway-dynamodb)
 
 Install package via composer
