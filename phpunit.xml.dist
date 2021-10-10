@@ -21,9 +21,4 @@
             <group>mongodb</group>
         </exclude>
     </groups>
-    <coverage>
-        <include>
-            <directory>./src/</directory>
-        </include>
-    </coverage>
 </phpunit>
