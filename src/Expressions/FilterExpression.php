@@ -11,41 +11,44 @@ namespace Broadway\EventStore\DynamoDb\Expressions;
 
 class FilterExpression
 {
-    private $expression;
+    private string $expression;
 
     public function __construct()
     {
         $this->expression = '';
     }
 
-    public function addComma()
+    public function addComma(): void
     {
         $this->expression .= ', ';
     }
 
-    public function addConditionOperator(string $condition)
+    public function addConditionOperator(string $condition): void
     {
         $this->expression .= ' ' . $condition . ' ';
     }
 
-    public function addInCondition($field)
+    /**
+     * @param array-key $field
+     */
+    public function addInCondition($field): void
     {
         $this->expression .=  '#' . $field . ' IN(';
     }
 
-    public function addInFieldWithPosition(string $field, int $position)
+    public function addInFieldWithPosition(string $field, int $position): void
     {
         $positionField = $position + 1;
 
         $this->expression .= ':' . $field . $positionField;
     }
 
-    public function addField(string $field)
+    public function addField(string $field): void
     {
         $this->expression .=  '#' . $field . ' = :' . $field;
     }
 
-    public function close()
+    public function close(): void
     {
         $this->expression .= ')';
     }

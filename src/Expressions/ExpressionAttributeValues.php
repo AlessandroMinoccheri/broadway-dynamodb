@@ -11,19 +11,24 @@ namespace Broadway\EventStore\DynamoDb\Expressions;
 
 class ExpressionAttributeValues
 {
-    private $expression;
+    private string $expression;
 
     public function __construct()
     {
         $this->expression = '{';
     }
 
-    public function addComma()
+    public function addComma(): void
     {
         $this->expression .= ',';
     }
 
-    public function addFieldWithPosition(string $field, int $position, $value)
+    /**
+     * @param string $field
+     * @param int    $position
+     * @param mixed  $value
+     */
+    public function addFieldWithPosition(string $field, int $position, $value): void
     {
         $positionField = $position + 1;
 
@@ -32,14 +37,18 @@ class ExpressionAttributeValues
         $this->expression .= '":' . $field. $positionField . '":'. $value;
     }
 
-    public function addField(string $field, $value)
+    /**
+     * @param string $field
+     * @param mixed  $value
+     */
+    public function addField(string $field, $value): void
     {
         $value = $this->addQuoteIfIsString($value);
 
         $this->expression .= '":' . $field . '":'. $value;
     }
 
-    public function close()
+    public function close(): void
     {
         $this->expression .= '}';
     }
@@ -49,6 +58,10 @@ class ExpressionAttributeValues
         return $this->expression;
     }
 
+    /**
+     * @param mixed $value
+     * @return mixed|string
+     */
     private function addQuoteIfIsString($value)
     {
         if (is_string($value)) {

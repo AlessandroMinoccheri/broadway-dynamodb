@@ -8,11 +8,15 @@
 
 namespace Broadway\EventStore\DynamoDb\Objects;
 
+use Aws\ResultInterface;
 
 class ConvertAwsItemToArray
 {
-    private static $keyMap = ['S', 'SS', 'N', 'NS', 'B', 'BS'];
+    private static array $keyMap = ['S', 'SS', 'N', 'NS', 'B', 'BS'];
 
+    /**
+     * @param ResultInterface|array|null $item
+     */
     public static function convert($item): ?array
     {
         if (empty($item)) {

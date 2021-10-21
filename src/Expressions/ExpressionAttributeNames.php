@@ -11,14 +11,14 @@ namespace Broadway\EventStore\DynamoDb\Expressions;
 
 class ExpressionAttributeNames
 {
-    private $expression;
+    private array $expression;
 
     public function __construct()
     {
         $this->expression = [];
     }
 
-    public function addField(string $field)
+    public function addField(string $field): void
     {
         $this->expression['#' . $field] = $field;
     }
