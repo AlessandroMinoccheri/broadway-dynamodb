@@ -222,7 +222,7 @@ class DynamoDbEventStore implements EventStore, EventStoreManagement
 
         $this->items = $itemsCollection;
 
-        if (null === $this->items) {
+        if (0 === $this->items->count()) {
             throw new EventStreamNotFoundException(sprintf(
                 'Items not found for table %s',
                 $this->table

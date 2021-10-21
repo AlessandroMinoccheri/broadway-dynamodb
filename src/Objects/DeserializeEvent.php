@@ -10,12 +10,16 @@
 namespace Broadway\EventStore\DynamoDb\Objects;
 
 
+use Aws\ResultInterface;
 use Broadway\Domain\DateTime;
 use Broadway\Domain\DomainMessage;
 use Broadway\Serializer\Serializer;
 
 class DeserializeEvent
 {
+    /**
+     * @param ResultInterface|array $row
+     */
     public static function deserialize(
         $row,
         Serializer $metadataSerializer,

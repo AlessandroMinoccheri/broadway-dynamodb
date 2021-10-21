@@ -4,9 +4,9 @@ namespace Broadway\EventStore\DynamoDb\Expressions;
 
 class CriteriaExpressionBuilder
 {
-    private $filterExpression;
-    private $expressionAttributeNames;
-    private $expressionAttributeValues;
+    private FilterExpression $filterExpression;
+    private ExpressionAttributeNames $expressionAttributeNames;
+    private ExpressionAttributeValues $expressionAttributeValues;
 
     public function __construct(array $fields)
     {
